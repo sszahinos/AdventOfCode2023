@@ -12,24 +12,34 @@ def analyze_data(data):
     total = 0
     for count, line in enumerate(data):
         cutLine = line.strip().split(':')
-        if (is_game_possible(cutLine[1])):
-            total += count + 1
-    print(total)
+        minCubes = get_game_set_min_cubes(cutLine[1])
+        cubesPower = get_cubes_power(minCubes)
+        total += cubesPower
+    print("Total: ", total)
     input()
         
-def is_game_possible(line):
-    gameSets = line.split(';')
-    for gameSet in gameSets:
-        reveals = gameSet.split(',')
-        revealArr = []
-        for reveal in reveals:
-            revealArr.append(reveal.strip().split(' ')[::-1])
-        revealDict = dict(revealArr)
-        for key in revealDict:
-            if (int(revealDict[key]) > int(max_cubes[key])):
-                return False
-    return True
+def get_cubes_power(minCubes):
+    total = 1
+    for key in minCubes:
+        total *= int(minCubes[key])
+    return total
 
+def get_game_set_min_cubes(line):
+    gameSets = line.split(';')
+    minCubes = {}
+    for gameSet in gameSets:
+        revealDict = get_reveal_dict(gameSet)
+        for key in revealDict:
+            if (key not in minCubes or int(minCubes[key]) < int(revealDict[key])):
+                minCubes[key] = revealDict[key]
+    return minCubes
+
+def get_reveal_dict(gameSet):
+    reveals = gameSet.split(',')
+    revealArr = []
+    for reveal in reveals:
+        revealArr.append(reveal.strip().split(' ')[::-1])
+    return dict(revealArr)
         
         
 
